@@ -307,6 +307,19 @@ fn test_media_invalid_transport() {
 #[test]
 fn test_media_invalid_payload() {
     assert!(parse_media("audio 9 UDP/TLS/RTP/SAVPF 300").is_err());
+
+    // reserved PTs from https://tools.ietf.org/html/rfc3551#section-6
+    assert!(parse_media("audio 9 UDP/TLS/RTP/SAVPF 1").is_err()); // reserved audio
+    assert!(parse_media("audio 9 UDP/TLS/RTP/SAVPF 2").is_err()); // reserved audio
+    assert!(parse_media("audio 9 UDP/TLS/RTP/SAVPF 19").is_err()); // reserved audio
+
+    // reserved PTs (64-95) from https://tools.ietf.org/html/rfc5761#section-4
+    for pt in 64..=95 {
+        assert!(
+            parse_media(&format!("audio 9 UDP/TLS/RTP/SAVPF {}", pt)).is_err(),
+            format!("pt '{}' should be reserved", pt)
+        );
+    }
 }
 
 #[test]

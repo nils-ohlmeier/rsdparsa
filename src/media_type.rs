@@ -380,12 +380,41 @@ pub fn parse_media(value: &str) -> Result<SdpType, SdpParserInternalError> {
             let mut fmt_vec: Vec<u32> = vec![];
             for num in fmt_slice {
                 let fmt_num = num.parse::<u32>()?;
+                // The folllowing is https://tools.ietf.org/html/rfc3551#section-6
+                // with restrictions added from
+                // https://tools.ietf.org/html/rfc5761#section-4
                 match fmt_num {
                     0  |  // PCMU
+                    3  |  // GSM
+                    4  |  // G723
+                    5  |  // DVI4
+                    6  |  // DVI4
+                    7  |  // LPC
                     8  |  // PCMA
                     9  |  // G722
+                    10 |  // L16
+                    11 |  // L16
+                    12 |  // QCELP
                     13 |  // Comfort Noise
-                    35 ..= 63 | 96 ..= 127 => (),  // dynamic range
+                    14 |  // MPA
+                    15 |  // G728
+                    16 |  // DVI4
+                    17 |  // DVI4
+                    18 |  // G729
+                    20 ..= 24 | // unassigned
+                    25 |  // CelB
+                    26 |  // JPEG
+                    27 |  // unassigned
+                    28 |  // nv
+                    29 |  // unassigned
+                    30 |  // unassigned
+                    31 |  // H261
+                    32 |  // MPV
+                    33 |  // MP2T
+                    34 |  // H263
+                    35 ..= 63 | // unassigned
+                    // rfc5761 says 64-95 MUST NOT be used
+                    96 ..= 127 => (),  // dynamic range
                     _ => return Err(SdpParserInternalError::Generic(
                           "format number in media line is out of range".to_string()))
                 };
